@@ -1,50 +1,66 @@
-import { createContext } from "react";
+import { createContext, useState, useEffect } from "react";
 
 export const CryptoContext = createContext();
 
-const CryptoContextProvider = ({props}) => {
+const CryptoContextProvider = ({ children }) => {
     const [cryptoList, setCryptoList] = useState([]);
-    const [filteredCrytos, setFilteredCrytos] = useState([]);
+    const [filteredCryptos, setFilteredCryptos] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentCurrency, setCurrentCurrency] = useState({
         name: "usd",
         symbol: "$"
     });
 
-    // API CG-fXeheecUEUf6rXg7hqPU6Rz4
     const fetchCryptoData = async () => {
         const options = {
             method: 'GET',
-            headers: {accept: 'application/json', 'x-cg-demo-api-key': 'CG-fXeheecUEUf6rXg7hqPU6Rz4'}
-          };
-          try {
-            const res = await fetch (
+            headers: {
+                accept: 'application/json',
+                'x-cg-demo-api-key': 'CG-fXeheecUEUf6rXg7hqPU6Rz4'
+            }
+        };
+        try {
+            const res = await fetch(
                 `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currentCurrency.name}`,
                 options
             );
             const data = await res.json();
             setCryptoList(data);
-          } catch (error) {
-            console.error("Failed to fetch crypto data:", err);
-          }
-    }
+        } catch (error) {
+            console.error("Failed to fetch crypto data:", error);
+        }
+    };
 
-    // RE-FETCH WHEN CURRENCY CHANGES
     useEffect(() => {
         fetchCryptoData();
     }, [currentCurrency]);
 
-    
+    useEffect(() => {
+        if (searchTerm.trim() === "") {
+            setFilteredCryptos(cryptoList);
+        } else {
+            setFilteredCryptos(
+                cryptoList.filter((c) =>
+                    c.name.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
+        }
+    }, [cryptoList, searchTerm]);
 
-
-    const contextValue = {};
-
+    const contextValue = {
+        cryptoList,
+        filteredCryptos,
+        currentCurrency,
+        setCurrentCurrency,
+        searchTerm,
+        setSearchTerm
+    };
 
     return (
-        <CryptoContext.Provider value={{contextValue}}>
-            {props.children}
+        <CryptoContext.Provider value={contextValue}>
+            {children}
         </CryptoContext.Provider>
-    )
-}
+    );
+};
 
-export default CryptoContextProvider;  
+export default CryptoContextProvider;

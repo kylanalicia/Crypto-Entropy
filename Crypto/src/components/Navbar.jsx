@@ -1,14 +1,30 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Coins } from 'lucide-react';
+import { CryptoContext } from '../context/CryptoContext';
 
 function Navbar() {
   const [input, setInput] = useState("");
   const [filteredCoins, setFilteredCoins] = useState([]);
+  const {cryptoList = [], setSearchTerm} = useContext(CryptoContext);
 
   const searchHandler = (event) => {
     event.preventDefault();
     setFilteredCoins([]);
     setSearchTerm(input);
+  }
+
+  const inputHandler = (event) => {
+    const value = event.target.value;
+    setInput(value);
+
+    if (value === "") {
+      setSearchTerm("");
+      setFilteredCoins([]);
+    }
+    else {
+      const suggestions = cryptoList.filter((coin) => coin.name.toLowerCase().includes(value.toLowerCase()));
+      setFilteredCoins(suggestions.slice(0, 5));
+    }
   }
 
 
@@ -24,12 +40,12 @@ function Navbar() {
       <form onSubmit={searchHandler} className='order-3 w-full md:order-2 md:w-auto flex-1 max-w-2xl
       mx-0 md:mx-4 relative'>
         <div className='relative group'>
-          <div className='absolute -inset-0.5 bg-gradient-to-r from-emerald-600/40 to-cyan-500/40 to-cyan-500/40 rounded-full blur
+          <div className='absolute -inset-0.5 bg-gradient-to-r from-emerald-600/40 to-cyan-500/40 rounded-full blur
           opacity-30 group-hover:opacity-50 transition duration-300'/>
           <div className='relative flex items-center '>
             <input type = "text" placeholder='Search Crypto...' value={input} onChange={inputHandler} required 
             className='w-full px-6 py-3 bg-gray-800/60 border border-gray-600/30 rounded-full
-            focus:outline-none focus:ring-emarald-500/50 placeholder-gray-400 text-gray-200 backdrop-blur-sm'/>
+            focus:outline-none focus:ring-emerald-500/50  placeholder-gray-400 text-gray-200 backdrop-blur-sm'/>
 
           </div>
           
