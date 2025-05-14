@@ -17,7 +17,7 @@ const Footer = () => {
                 &middot;
                 <a href = "https://hexagondigitalservices.com"
                 target='_blank' className="ml-2 hover:text-purple-400 transition-colors">
-                    Hexagon Digital Services
+                    Alicia Kimani
                 </a>
 
             </p>
